@@ -1,0 +1,215 @@
+{% extends 'devices/base.html' %}
+{% load static %}
+
+{% block title %}Список устройств{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>📋 Все устройства</h1>
+                <div>
+                    <span class="badge bg-primary me-2">Всего: {{ devices.paginator.count }}</span>
+                    <span class="badge bg-success me-2">Включено: {{ devices|length }}</span>
+                </div>
+            </div>
+
+            <!-- Фильтры -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="type" class="form-label">Тип устройства</label>
+                            <select name="type" id="type" class="form-select">
+                                <option value="">Все типы</option>
+                                {% for value, label in device_types %}
+                                    <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="room" class="form-label">Комната</label>
+                            <select name="room" id="room" class="form-select">
+                                <option value="">Все комнаты</option>
+                                {% for room in rooms %}
+                                    <option value="{{ room.id }}" {% if selected_room == room.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ room.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-filter"></i> Применить
+                            </button>
+                            <a href="{% url 'devices:device_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Список устройств -->
+            <div class="row">
+                {% for device in devices %}
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card device-card h-100 {% if device.status == 'on' %}border-success{% endif %}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title mb-2">
+                                    {% if device.device_type == 'light' %}💡
+                                    {% elif device.device_type == 'tv' %}📺
+                                    {% elif device.device_type == 'ac' %}❄️
+                                    {% elif device.device_type == 'coffee' %}☕
+                                    {% elif device.device_type == 'washer' %}🧺
+                                    {% elif device.device_type == 'socket' %}🔌
+                                    {% endif %}
+                                    {{ device.name }}
+                                </h5>
+                                <span class="badge {% if device.is_online %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if device.is_online %}В сети{% else %}Не в сети{% endif %}
+                                </span>
+                            </div>
+
+                            <p class="card-text small text-muted mb-2">
+                                <i class="bi bi-tag"></i> {{ device.get_device_type_display }}
+                                <br>
+                                <i class="bi bi-house"></i> {{ device.room.name }}
+                            </p>
+
+                            <div class="mb-2">
+                                <span class="badge {% if device.status == 'on' %}bg-success{% elif device.status == 'off' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                    {{ device.get_status_display }}
+                                </span>
+                            </div>
+
+                            <!-- Специфичная информация для разных устройств -->
+                            {% if device.device_type == 'light' %}
+                                {% with light=device.lightdevice %}
+                                <div class="progress mb-2" style="height: 5px;">
+                                    <div class="progress-bar bg-warning" role="progressbar"
+                                         style="width: {{ light.brightness }}%"></div>
+                                </div>
+                                <small class="text-muted">Яркость: {{ light.brightness }}%</small>
+                                {% endwith %}
+                            {% endif %}
+
+                            {% if device.device_type == 'tv' %}
+                                {% with tv=address %}
+                                <small class="text-muted">Канал: {{ tv.channel }} | Громкость: {{ tv.volume }}%</small>
+                                {% endwith %}
+                            {% endif %}
+
+                            {% if device.device_type == 'ac' %}
+                                {% with ac=device.acdevice %}
+                                <small class="text-muted">Температура: {{ ac.temperature }}°C</small>
+                                {% endwith %}
+                            {% endif %}
+
+                            <div class="btn-group mt-2 w-100" role="group">
+                                <form method="post" action="{% url 'devices:toggle_device' device.id %}" style="display: inline; flex: 1;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm {% if device.status == 'on' %}btn-warning{% else %}btn-success{% endif %} w-100">
+                                        {% if device.status == 'on' %}
+                                            <i class="bi bi-power"></i> Выключить
+                                        {% else %}
+                                            <i class="bi bi-power"></i> Включить
+                                        {% endif %}
+                                    </button>
+                                </form>
+                                <a href="{% url 'devices:device_detail' device.id %}" class="btn btn-sm btn-info" style="flex: 1;">
+                                    <i class="bi bi-eye"></i> Детали
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted small">
+                            <i class="bi bi-clock"></i> {{ device.updated_at|date:"d.m.Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <h4>📭 Устройства не найдены</h4>
+                        <p>Попробуйте изменить параметры фильтрации</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Пагинация -->
+            {% if devices.has_other_pages %}
+            <nav aria-label="Навигация по страницам">
+                <ul class="pagination justify-content-center">
+                    {% if devices.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ devices.previous_page_number }}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_room %}&room={{ selected_room }}{% endif %}">
+                            <i class="bi bi-chevron-left"></i> Предыдущая
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-left"></i> Предыдущая</span>
+                    </li>
+                    {% endif %}
+
+                    {% for num in devices.paginator.page_range %}
+                        {% if devices.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > devices.number|add:'-3' and num < devices.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_room %}&room={{ selected_room }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if devices.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ devices.next_page_number }}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_room %}&room={{ selected_room }}{% endif %}">
+                            Следующая <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Следующая <i class="bi bi-chevron-right"></i></span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.device-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.device-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+.device-card .btn-group .btn {
+    border-radius: 0;
+}
+.device-card .btn-group .btn:first-child {
+    border-radius: 4px 0 0 4px;
+}
+.device-card .btn-group .btn:last-child {
+    border-radius: 0 4px 4px 0;
+}
+.progress {
+    background-color: #e9ecef;
+}
+</style>
+{% endblock %}

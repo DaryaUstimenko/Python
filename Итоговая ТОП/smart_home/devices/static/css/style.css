@@ -1,0 +1,111 @@
+/* Основной фон страницы с паттерном */
+body {
+    background: linear-gradient(135deg, #b8cff1 0%, #e8edf5 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Создаем слой с иконками на фоне */
+body::before {
+    content: "🏠 🏡 🏢 🏘️ 🏚️ 🏪 🏫 🏩 💡 🔌 📺 ❄️ ☕ 🧺 🔑 🛋️ 🪑 🛏️ 🚪 🪟 🏠 🏡 🏢 🏘️";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 60px;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: space-around;
+    padding: 20px;
+    line-height: 1.8;
+    letter-spacing: 30px;
+    word-spacing: 50px;
+    transform: rotate(-5deg) scale(1.1);
+}
+
+/* Альтернативный вариант с использованием SVG паттерна */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='10' y='30' font-size='30' opacity='0.05'%3E🏠%3C/text%3E%3Ctext x='60' y='70' font-size='30' opacity='0.05'%3E💡%3C/text%3E%3Ctext x='30' y='90' font-size='25' opacity='0.04'%3E📺%3C/text%3E%3Ctext x='70' y='40' font-size='25' opacity='0.04'%3E❄️%3C/text%3E%3Ctext x='15' y='60' font-size='20' opacity='0.03'%3E☕%3C/text%3E%3Ctext x='80' y='20' font-size='20' opacity='0.03'%3E🔌%3C/text%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.8;
+}
+
+/* Стиль для главного контейнера - поднимаем над фоном */
+main {
+    background: linear-gradient(135deg, #8585ff 0%, #16213e 50%, #0f3460 100%) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    margin: 20px auto;
+    padding: 25px !important;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    max-width: 1400px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Альтернативный вариант с плавающими иконками */
+.floating-icons {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.floating-icons .icon {
+    position: absolute;
+    font-size: 30px;
+    opacity: 0.08;
+    animation: float 20s infinite ease-in-out;
+}
+
+.floating-icons .icon:nth-child(1) { top: 5%; left: 3%; animation-delay: 0s; font-size: 35px; }
+.floating-icons .icon:nth-child(2) { top: 15%; right: 8%; animation-delay: 2s; font-size: 28px; }
+.floating-icons .icon:nth-child(3) { top: 40%; left: 2%; animation-delay: 4s; font-size: 40px; }
+.floating-icons .icon:nth-child(4) { top: 60%; right: 5%; animation-delay: 6s; font-size: 32px; }
+.floating-icons .icon:nth-child(5) { top: 80%; left: 8%; animation-delay: 8s; font-size: 25px; }
+.floating-icons .icon:nth-child(6) { top: 10%; left: 50%; animation-delay: 1s; font-size: 30px; }
+.floating-icons .icon:nth-child(7) { top: 50%; left: 45%; animation-delay: 3s; font-size: 35px; }
+.floating-icons .icon:nth-child(8) { top: 85%; right: 45%; animation-delay: 5s; font-size: 28px; }
+.floating-icons .icon:nth-child(9) { top: 30%; right: 25%; animation-delay: 7s; font-size: 22px; }
+.floating-icons .icon:nth-child(10) { top: 70%; left: 25%; animation-delay: 9s; font-size: 26px; }
+.floating-icons .icon:nth-child(11) { top: 20%; left: 25%; animation-delay: 2.5s; font-size: 20px; }
+.floating-icons .icon:nth-child(12) { top: 75%; right: 30%; animation-delay: 4.5s; font-size: 24px; }
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-15px) rotate(5deg); }
+    50% { transform: translateY(10px) rotate(-3deg); }
+    75% { transform: translateY(-10px) rotate(4deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Навбар с градиентом - поднимаем над фоном */
+.navbar {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    padding: 12px 0;
+    position: relative;
+    z-index: 1000;
+}

@@ -1,0 +1,65 @@
+<div class="mb-3">
+    <label class="form-label">Громкость: <span id="volumeValue">{{ tv.volume }}%</span></label>
+    <input type="range" class="form-range" id="volumeSlider"
+           min="0" max="100" value="{{ tv.volume }}"
+           oninput="updateVolume(this.value)">
+    <button class="btn btn-sm btn-primary mt-2" onclick="setVolume()">
+        <i class="bi bi-check"></i> Применить
+    </button>
+</div>
+
+<div class="mb-3">
+    <button class="btn btn-sm {% if tv.is_muted %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+            onclick="toggleMute()">
+        <i class="bi {% if tv.is_muted %}bi-volume-mute{% else %}bi-volume-up{% endif %}"></i>
+        {% if tv.is_muted %}Включить звук{% else %}Выключить звук{% endif %}
+    </button>
+</div>
+
+<script>
+function updateVolume(value) {
+    document.getElementById('volumeValue').textContent = value + '%';
+}
+
+function setVolume() {
+    const value = document.getElementById('volumeSlider').value;
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            action: 'set_volume',
+            volume: parseInt(value)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+        } else {
+            alert('Ошибка: ' + data.error);
+        }
+    });
+}
+
+function toggleMute() {
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            action: 'toggle_mute'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>

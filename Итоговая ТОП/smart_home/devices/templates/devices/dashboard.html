@@ -1,0 +1,134 @@
+{% extends 'devices/base.html' %}
+{% load static %}
+
+{% block title %}Панель управления{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">🏠 Умный дом</h1>
+
+            <!-- Статистика -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">Всего устройств</h5>
+                            <h2>{{ stats.total }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">В сети</h5>
+                            <h2>{{ stats.online }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Включено</h5>
+                            <h2>{{ stats.on }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-secondary">
+                        <div class="card-body">
+                            <h5 class="card-title">Комнат</h5>
+                            <h2>{{ stats.rooms }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сценарии -->
+            {% if scenes %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>📋 Быстрые сценарии</h3>
+                    <div class="btn-group" role="group">
+                        {% for scene in scenes %}
+                            <form method="post" action="{% url 'devices:activate_scene' scene.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-primary">
+                                    {{ scene.name }}
+                                </button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Комнаты и устройства -->
+            {% for room_data in rooms %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>{{ room_data.room.name }}</h3>
+                    <small class="text-muted">{{ room_data.count }} устройств</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for device in room_data.devices %}
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card device-card {% if device.status == 'on' %}border-success{% endif %}">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">
+                                        {% if device.device_type == 'light' %}💡
+                                        {% elif device.device_type == 'tv' %}📺
+                                        {% elif device.device_type == 'ac' %}❄️
+                                        {% elif device.device_type == 'coffee' %}☕
+                                        {% elif device.device_type == 'washer' %}🧺
+                                        {% elif device.device_type == 'socket' %}🔌
+                                        {% endif %}
+                                        {{ device.name }}
+                                    </h5>
+                                    <p class="card-text">
+                                        <span class="badge {% if device.status == 'on' %}bg-success{% elif device.status == 'off' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                            {{ device.get_status_display }}
+                                        </span>
+                                        {% if not device.is_online %}
+                                        <span class="badge bg-danger">Не в сети</span>
+                                        {% endif %}
+                                    </p>
+                                    <div class="btn-group" role="group">
+                                        <form method="post" action="{% url 'devices:toggle_device' device.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm {% if device.status == 'on' %}btn-warning{% else %}btn-success{% endif %}">
+                                                {% if device.status == 'on' %}Выключить{% else %}Включить{% endif %}
+                                            </button>
+                                        </form>
+                                        <a href="{% url 'devices:device_detail' device.id %}" class="btn btn-sm btn-info">Подробнее</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Автоматическое обновление статуса устройств
+setInterval(function() {
+    fetch('{% url "devices:device_stats" %}')
+        .then(response => response.json())
+        .then(data => {
+            // Обновление статистики
+            document.querySelectorAll('.stat-value').forEach(el => {
+                // Обновление значений
+            });
+        });
+}, 30000); // Обновление каждые 30 секунд
+</script>
+{% endblock %}

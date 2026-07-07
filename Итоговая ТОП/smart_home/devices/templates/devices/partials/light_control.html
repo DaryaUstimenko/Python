@@ -1,0 +1,38 @@
+<div class="mb-3">
+    <label class="form-label">Яркость: <span id="brightnessValue">{{ light.brightness }}%</span></label>
+    <input type="range" class="form-range" id="brightnessSlider"
+           min="0" max="100" value="{{ light.brightness }}"
+           oninput="updateBrightness(this.value)">
+    <button class="btn btn-sm btn-primary mt-2" onclick="setBrightness()">
+        <i class="bi bi-check"></i> Применить
+    </button>
+</div>
+
+<script>
+function updateBrightness(value) {
+    document.getElementById('brightnessValue').textContent = value + '%';
+}
+
+function setBrightness() {
+    const value = document.getElementById('brightnessSlider').value;
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            action: 'set_brightness',
+            brightness: parseInt(value)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+        } else {
+            alert('Ошибка: ' + data.error);
+        }
+    });
+}
+</script>

@@ -1,0 +1,70 @@
+<div class="mb-3">
+    <label class="form-label">Температура: <span id="tempValue">{{ ac.temperature }}°C</span></label>
+    <input type="range" class="form-range" id="tempSlider"
+           min="16" max="30" value="{{ ac.temperature }}"
+           oninput="updateTemperature(this.value)">
+    <button class="btn btn-sm btn-primary mt-2" onclick="setTemperature()">
+        <i class="bi bi-check"></i> Применить
+    </button>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Режим</label>
+    <div class="btn-group w-100" role="group">
+        {% for mode_value, mode_label in ac.MODES %}
+        <button class="btn btn-sm {% if ac.mode == mode_value %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+                onclick="setMode('{{ mode_value }}')">
+            {{ mode_label }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function updateTemperature(value) {
+    document.getElementById('tempValue').textContent = value + '°C';
+}
+
+function setTemperature() {
+    const value = document.getElementById('tempSlider').value;
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            action: 'set_temperature',
+            temperature: parseInt(value)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+        } else {
+            alert('Ошибка: ' + data.error);
+        }
+    });
+}
+
+function setMode(mode) {
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            action: 'set_mode',
+            mode: mode
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>

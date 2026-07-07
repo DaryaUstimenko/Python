@@ -1,0 +1,291 @@
+{% extends 'devices/base.html' %}
+{% load static %}
+
+{% block title %}{{ device.name }} - Детали{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'devices:dashboard' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'devices:device_list' %}">Устройства</a></li>
+                    <li class="breadcrumb-item active">{{ device.name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            {% if device.device_type == 'light' %}💡
+                            {% elif device.device_type == 'tv' %}📺
+                            {% elif device.device_type == 'ac' %}❄️
+                            {% elif device.device_type == 'coffee' %}☕
+                            {% elif device.device_type == 'washer' %}🧺
+                            {% elif device.device_type == 'socket' %}🔌
+                            {% endif %}
+                            {{ device.name }}
+                        </h3>
+                        <div>
+                            <span class="badge {% if device.is_online %}bg-success{% else %}bg-danger{% endif %} me-2">
+                                {% if device.is_online %}🟢 В сети{% else %}🔴 Не в сети{% endif %}
+                            </span>
+                            <span class="badge {% if device.status == 'on' %}bg-success{% elif device.status == 'off' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                {{ device.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>📋 Основная информация</h5>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Тип:</strong></td>
+                                    <td>{{ device.get_device_type_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Комната:</strong></td>
+                                    <td>{{ device.room.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>IP-адрес:</strong></td>
+                                    <td>{{ device.ip_address|default:"Не указан" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MAC-адрес:</strong></td>
+                                    <td>{{ device.mac_address|default:"Не указан" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Версия прошивки:</strong></td>
+                                    <td>{{ device.firmware_version }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Создано:</strong></td>
+                                    <td>{{ device.created_at|date:"d.m.Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Обновлено:</strong></td>
+                                    <td>{{ device.updated_at|date:"d.m.Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>🎮 Управление</h5>
+
+                            <!-- Базовое управление -->
+                            <form method="post" action="{% url 'devices:toggle_device' device.id %}" class="mb-3">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-lg {% if device.status == 'on' %}btn-warning{% else %}btn-success{% endif %} w-100">
+                                    {% if device.status == 'on' %}
+                                        <i class="bi bi-power"></i> Выключить
+                                    {% else %}
+                                        <i class="bi bi-power"></i> Включить
+                                    {% endif %}
+                                </button>
+                            </form>
+
+                            <!-- Специфичное управление для разных типов устройств -->
+                            {% if device.device_type == 'light' %}
+                                {% include 'devices/partials/light_control.html' with light=specific_data %}
+                            {% elif device.device_type == 'tv' %}
+                                {% include 'devices/partials/tv_control.html' with tv=specific_data %}
+                            {% elif device.device_type == 'ac' %}
+                                {% include 'devices/partials/ac_control.html' with ac=specific_data %}
+                            {% elif device.device_type == 'coffee' %}
+                                {% include 'devices/partials/coffee_control.html' with coffee=specific_data %}
+                            {% elif device.device_type == 'washer' %}
+                                {% include 'devices/partials/washer_control.html' with washer=specific_data %}
+                            {% elif device.device_type == 'socket' %}
+                                {% include 'devices/partials/socket_control.html' with socket=specific_data %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Логи устройства -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>📜 История действий</h5>
+                </div>
+                <div class="card-body">
+                    {% if logs %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Время</th>
+                                    <th>Действие</th>
+                                    <th>Пользователь</th>
+                                    <th>Старый статус</th>
+                                    <th>Новый статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.created_at|date:"d.m.Y H:i:s" }}</td>
+                                    <td>{{ log.action }}</td>
+                                    <td>{{ log.user.username|default:"Система" }}</td>
+                                    <td>
+                                        {% if log.old_status %}
+                                        <span class="badge bg-secondary">{{ log.old_status }}</span>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if log.new_status %}
+                                        <span class="badge {% if log.new_status == 'on' %}bg-success{% elif log.new_status == 'off' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                            {{ log.new_status }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">История действий пуста</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель -->
+        <div class="col-lg-4">
+            <!-- Статистика устройства -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>📊 Статистика</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Общее время работы</label>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 75%">
+                                75%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Надежность</label>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 92%">
+                                92%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Активность</label>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 68%">
+                                68%
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6>Включений</h6>
+                            <h3>156</h3>
+                        </div>
+                        <div class="col-6">
+                            <h6>Выключений</h6>
+                            <h3>142</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Быстрые действия -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>⚡ Быстрые действия</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" onclick="showSchedule()">
+                            <i class="bi bi-clock"></i> Настроить расписание
+                        </button>
+                        <button class="btn btn-outline-success" onclick="addToScene()">
+                            <i class="bi bi-plus-circle"></i> Добавить в сценарий
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="showDiagnostics()">
+                            <i class="bi bi-heart-pulse"></i> Диагностика
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Информация о производителе -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>ℹ️ О устройстве</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Производитель:</strong> SmartHome Inc.</p>
+                    <p><strong>Модель:</strong> SH-{{ device.device_type|upper }}-{{ device.id }}</p>
+                    <p><strong>Серийный номер:</strong> SN{{ device.id|stringformat:"08d" }}</p>
+                    <p><strong>Гарантия:</strong> до {{ device.created_at|date:"Y"|add:"2" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для управления -->
+<div class="modal fade" id="controlModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Управление устройством</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="controlModalBody">
+                <!-- Содержимое загружается динамически -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showSchedule() {
+    alert('Настройка расписания для {{ device.name }}');
+}
+
+function addToScene() {
+    alert('Добавление {{ device.name }} в сценарий');
+}
+
+function showDiagnostics() {
+    alert('Запуск диагностики {{ device.name }}...');
+}
+
+// Автоматическое обновление статуса
+function updateDeviceStatus() {
+    fetch('{% url "devices:device_stats" %}')
+        .then(response => response.json())
+        .then(data => {
+            // Обновление статуса устройства
+        });
+}
+
+// Обновление каждые 30 секунд
+setInterval(updateDeviceStatus, 30000);
+</script>
+{% endblock %}

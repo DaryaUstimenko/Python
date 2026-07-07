@@ -1,0 +1,443 @@
+<div class="coffee-control">
+    <!-- Уровни ресурсов -->
+    <div class="mb-3">
+        <div class="row">
+            <div class="col-6">
+                <label class="form-label">
+                    <i class="bi bi-droplet text-primary"></i> Вода:
+                    <span id="waterLevel">{{ coffee.water_level|default:"80" }}%</span>
+                </label>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar progress-bar-info" role="progressbar"
+                         style="width: {{ coffee.water_level|default:"80" }}%">
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <label class="form-label">
+                    <i class="bi bi-cup-hot text-warning"></i> Зерна:
+                    <span id="beansLevel">{{ coffee.beans_level|default:"70" }}%</span>
+                </label>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar progress-bar-warning" role="progressbar"
+                         style="width: {{ coffee.beans_level|default:"70" }}%">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Выбор крепости -->
+    <div class="mb-3">
+        <label class="form-label">Крепость</label>
+        <div class="btn-group w-100" role="group">
+            {% for strength_value, strength_label in coffee.STRENGTHS %}
+            <button class="btn btn-sm {% if coffee.strength == strength_value %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+                    onclick="setStrength('{{ strength_value }}')">
+                {% if strength_value == 'weak' %}🌱
+                {% elif strength_value == 'medium' %}🌿
+                {% elif strength_value == 'strong' %}🌳
+                {% endif %}
+                {{ strength_label }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Выбор размера порции -->
+    <div class="mb-3">
+        <label class="form-label">Размер порции</label>
+        <div class="btn-group w-100" role="group">
+            {% for size_value, size_label in coffee.SIZES %}
+            <button class="btn btn-sm {% if coffee.size == size_value %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+                    onclick="setSize('{{ size_value }}')">
+                {% if size_value == 'small' %}☕
+                {% elif size_value == 'medium' %}☕☕
+                {% elif size_value == 'large' %}☕☕☕
+                {% endif %}
+                {{ size_label }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Приготовление кофе -->
+    <div class="mb-3">
+        <div class="d-grid gap-2">
+            <button class="btn btn-success btn-lg" onclick="makeCoffee()"
+                    {% if coffee.water_level < 10 or coffee.beans_level < 10 or device.status != 'on' %}disabled{% endif %}>
+                <i class="bi bi-cup-hot"></i> Приготовить кофе
+            </button>
+            {% if coffee.water_level < 10 or coffee.beans_level < 10 %}
+            <small class="text-danger text-center">
+                <i class="bi bi-exclamation-triangle"></i>
+                {% if coffee.water_level < 10 %}Недостаточно воды! {% endif %}
+                {% if coffee.beans_level < 10 %}Недостаточно зерен! {% endif %}
+            </small>
+            {% endif %}
+            {% if device.status != 'on' %}
+            <small class="text-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i> Кофемашина выключена!
+            </small>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Очистка и обслуживание -->
+    <div class="mb-3">
+        <div class="row">
+            <div class="col-6">
+                <div class="d-grid">
+                    <button class="btn btn-outline-secondary" onclick="startCleaning()"
+                            {% if coffee.is_cleaning %}disabled{% endif %}>
+                        <i class="bi bi-brush"></i>
+                        {% if coffee.is_cleaning %}Очистка...{% else %}Очистка{% endif %}
+                    </button>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="d-grid">
+                    <button class="btn btn-outline-info" onclick="showStatus()">
+                        <i class="bi bi-info-circle"></i> Статус
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Статистика использования -->
+    <div class="mt-3">
+        <div class="card bg-light">
+            <div class="card-body py-2">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <small class="text-muted">Всего порций</small>
+                        <h6 class="mb-0" id="totalCups">0</h6>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Сегодня</small>
+                        <h6 class="mb-0" id="todayCups">0</h6>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Последний раз</small>
+                        <h6 class="mb-0" id="lastUse">--</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Переменные для статистики
+let totalCups = parseInt(localStorage.getItem('coffeeTotalCups') || '0');
+let todayCups = parseInt(localStorage.getItem('coffeeTodayCups') || '0');
+let lastUse = localStorage.getItem('coffeeLastUse') || '--';
+
+// Обновляем отображение статистики
+document.getElementById('totalCups').textContent = totalCups;
+document.getElementById('todayCups').textContent = todayCups;
+document.getElementById('lastUse').textContent = lastUse;
+
+function setStrength(strength) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'set_strength',
+            strength: strength
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('success', data.message);
+            // Обновляем активную кнопку
+            document.querySelectorAll('.coffee-control .btn-group:first-child .btn').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-secondary');
+            });
+            document.querySelector(`.coffee-control .btn-group:first-child .btn[onclick="setStrength('${strength}')"]`)
+                .classList.replace('btn-outline-secondary', 'btn-primary');
+        } else {
+            showNotification('danger', data.error || 'Ошибка при установке крепости');
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+    });
+}
+
+function setSize(size) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'set_size',
+            size: size
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('success', data.message);
+            // Обновляем активную кнопку
+            document.querySelectorAll('.coffee-control .btn-group:last-child .btn').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-secondary');
+            });
+            document.querySelector(`.coffee-control .btn-group:last-child .btn[onclick="setSize('${size}')"]`)
+                .classList.replace('btn-outline-secondary', 'btn-primary');
+        } else {
+            showNotification('danger', data.error || 'Ошибка при установке размера');
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+    });
+}
+
+function makeCoffee() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Меняем текст кнопки
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Готовлю...';
+    button.disabled = true;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'make_coffee'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Обновляем статистику
+            totalCups++;
+            todayCups++;
+            const now = new Date();
+            lastUse = now.toLocaleTimeString();
+
+            localStorage.setItem('coffeeTotalCups', totalCups.toString());
+            localStorage.setItem('coffeeTodayCups', todayCups.toString());
+            localStorage.setItem('coffeeLastUse', lastUse);
+
+            document.getElementById('totalCups').textContent = totalCups;
+            document.getElementById('todayCups').textContent = todayCups;
+            document.getElementById('lastUse').textContent = lastUse;
+
+            showNotification('success', '☕ ' + data.message);
+
+            // Обновляем уровни воды и зерен
+            if (data.water_level !== undefined) {
+                const waterLevel = data.water_level;
+                document.getElementById('waterLevel').textContent = waterLevel + '%';
+                document.querySelector('.progress-bar-info').style.width = waterLevel + '%';
+            }
+            if (data.beans_level !== undefined) {
+                const beansLevel = data.beans_level;
+                document.getElementById('beansLevel').textContent = beansLevel + '%';
+                document.querySelector('.progress-bar-warning').style.width = beansLevel + '%';
+            }
+        } else {
+            showNotification('danger', data.error || 'Ошибка при приготовлении кофе');
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+    })
+    .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+function startCleaning() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+
+    if (confirm('Запустить процесс очистки кофемашины? Это займет несколько минут.')) {
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Очистка...';
+        button.disabled = true;
+
+        fetch('{% url "devices:control_device" device.id %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                action: 'start_cleaning'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('success', '🧹 ' + data.message);
+                // Обновляем статус очистки
+                if (data.is_cleaning !== undefined) {
+                    button.innerHTML = data.is_cleaning ? 'Очистка...' : 'Очистка';
+                }
+            } else {
+                showNotification('danger', data.error || 'Ошибка при запуске очистки');
+            }
+        })
+        .catch(error => {
+            showNotification('danger', 'Ошибка сети: ' + error.message);
+        })
+        .finally(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
+}
+
+function showStatus() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'get_status'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const statusMessage = `
+📊 СТАТУС КОФЕМАШИНЫ
+━━━━━━━━━━━━━━━━━━━━━━━━━
+🔌 Статус: ${data.status || 'Неизвестно'}
+💧 Вода: ${data.water_level || 0}%
+🫘 Зерна: ${data.beans_level || 0}%
+☕ Крепость: ${data.strength_display || 'Средняя'}
+📏 Размер: ${data.size_display || 'Средний'}
+🧹 Очистка: ${data.is_cleaning ? 'В процессе' : 'Не требуется'}
+📊 Всего порций: ${totalCups}
+📅 Сегодня: ${todayCups}
+🕐 Последний раз: ${lastUse}
+━━━━━━━━━━━━━━━━━━━━━━━━━
+            `;
+            alert(statusMessage);
+        } else {
+            showNotification('danger', 'Ошибка получения статуса');
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+    });
+}
+
+// Функция для отображения уведомлений
+function showNotification(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    const container = document.querySelector('.container-fluid');
+    if (container) {
+        container.prepend(alertDiv);
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+}
+
+// Сброс счетчика сегодняшних порций при полуночи
+function resetDailyCounter() {
+    const now = new Date();
+    const lastReset = localStorage.getItem('coffeeLastReset');
+    const today = now.toDateString();
+
+    if (lastReset !== today) {
+        todayCups = 0;
+        localStorage.setItem('coffeeTodayCups', '0');
+        localStorage.setItem('coffeeLastReset', today);
+        document.getElementById('todayCups').textContent = '0';
+    }
+}
+
+// Проверяем сброс счетчика при загрузке
+resetDailyCounter();
+
+// Проверяем каждую минуту
+setInterval(resetDailyCounter, 60000);
+</script>
+
+<style>
+.coffee-control .btn-group .btn {
+    flex: 1;
+}
+
+.coffee-control .progress {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.coffee-control .progress-bar-info {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.coffee-control .progress-bar-warning {
+    background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
+}
+
+.coffee-control .btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+}
+
+.coffee-control .btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0e7a72 0%, #2dbd66 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+}
+
+.coffee-control .btn-success:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.coffee-control .btn-outline-secondary:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.coffee-control .btn-outline-secondary.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-color: transparent;
+}
+
+.coffee-control .card {
+    border: none;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+}
+</style>

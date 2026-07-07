@@ -1,0 +1,323 @@
+{% extends 'devices/base.html' %}
+{% load static %}
+
+{% block title %}{{ room.name }} - Детали комнаты{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'devices:dashboard' %}">🏠 Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'devices:device_list' %}">📋 Устройства</a></li>
+            <li class="breadcrumb-item active">{{ room.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Информация о комнате -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">🏠 {{ room.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>Тип комнаты:</strong></td>
+                            <td>{{ room.room_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Этаж:</strong></td>
+                            <td>{{ room.floor }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Описание:</strong></td>
+                            <td>{{ room.description|default:"Не указано" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Устройств:</strong></td>
+                            <td>
+                                <span class="badge bg-primary">{{ device_count }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Создана:</strong></td>
+                            <td>{{ room.created_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Обновлена:</strong></td>
+                            <td>{{ room.updated_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                    </table>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <button class="btn btn-outline-primary" onclick="turnOnAllLights()">
+                            💡 Включить все светильники
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="turnOffAllLights()">
+                            💡 Выключить все светильники
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Статистика по комнате -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>📊 Статистика</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6>Включено</h6>
+                            <h3 class="text-success" id="devicesOnCount">0</h3>
+                        </div>
+                        <div class="col-6">
+                            <h6>Выключено</h6>
+                            <h3 class="text-secondary" id="devicesOffCount">0</h3>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6>В сети</h6>
+                            <h3 class="text-info" id="devicesOnlineCount">0</h3>
+                        </div>
+                        <div class="col-6">
+                            <h6>Не в сети</h6>
+                            <h3 class="text-danger" id="devicesOfflineCount">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список устройств в комнате -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📱 Устройства в комнате</h5>
+                    <span class="badge bg-primary">{{ device_count }}</span>
+                </div>
+                <div class="card-body">
+                    {% if devices %}
+                        <div class="row">
+                            {% for device in devices %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card device-card h-100 {% if device.status == 'on' %}border-success{% endif %}">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h6 class="card-title mb-1">
+                                                {% if device.device_type == 'light' %}💡
+                                                {% elif device.device_type == 'tv' %}📺
+                                                {% elif device.device_type == 'ac' %}❄️
+                                                {% elif device.device_type == 'coffee' %}☕
+                                                {% elif device.device_type == 'washer' %}🧺
+                                                {% elif device.device_type == 'socket' %}🔌
+                                                {% endif %}
+                                                {{ device.name }}
+                                            </h6>
+                                            <span class="badge {% if device.is_online %}bg-success{% else %}bg-danger{% endif %}" style="font-size: 0.7rem;">
+                                                {% if device.is_online %}🟢 В сети{% else %}🔴 Не в сети{% endif %}
+                                            </span>
+                                        </div>
+
+                                        <p class="card-text small text-muted mb-2">
+                                            <i class="bi bi-tag"></i> {{ device.device_type_display }}
+                                            <br>
+                                            <span class="badge {% if device.status == 'on' %}bg-success{% elif device.status == 'off' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                                {{ device.status_display }}
+                                            </span>
+                                        </p>
+
+                                        <!-- Специфичная информация -->
+                                        {% if device.device_type == 'light' %}
+                                            {% with light=device.lightdevice %}
+                                                <div class="progress mb-2" style="height: 4px;">
+                                                    <div class="progress-bar bg-warning" role="progressbar"
+                                                         style="width: {{ light.brightness }}%"></div>
+                                                </div>
+                                                <small class="text-muted">Яркость: {{ light.brightness }}%</small>
+                                            {% endwith %}
+                                        {% elif device.device_type == 'tv' %}
+                                            {% with tv=device.tvdevice %}
+                                                <small class="text-muted">📺 Канал: {{ tv.channel }} | 🔊 {{ tv.volume }}%</small>
+                                            {% endwith %}
+                                        {% elif device.device_type == 'ac' %}
+                                            {% with ac=device.acdevice %}
+                                                <small class="text-muted">🌡️ {{ ac.temperature }}°C | {{ ac.mode_display }}</small>
+                                            {% endwith %}
+                                        {% elif device.device_type == 'coffee' %}
+                                            {% with coffee=device.coffeemachine %}
+                                                <small class="text-muted">☕ {{ coffee.strength_display }} | {{ coffee.size_display }}</small>
+                                            {% endwith %}
+                                        {% elif device.device_type == 'washer' %}
+                                            {% with washer=device.washerdevice %}
+                                                <small class="text-muted">
+                                                    {% if washer.is_running %}
+                                                        🔄 Работает ({{ washer.time_remaining }} мин)
+                                                    {% else %}
+                                                        ⏸ Остановлена
+                                                    {% endif %}
+                                                </small>
+                                            {% endwith %}
+                                        {% elif device.device_type == 'socket' %}
+                                            {% with socket=device.socketdevice %}
+                                                <small class="text-muted">⚡ {{ socket.power_consumption }} Вт</small>
+                                            {% endwith %}
+                                        {% endif %}
+
+                                        <div class="btn-group mt-2 w-100" role="group">
+                                            <form method="post" action="{% url 'devices:toggle_device' device.id %}" style="display: inline; flex: 1;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm {% if device.status == 'on' %}btn-warning{% else %}btn-success{% endif %} w-100">
+                                                    {% if device.status == 'on' %}
+                                                        <i class="bi bi-power"></i> Выключить
+                                                    {% else %}
+                                                        <i class="bi bi-power"></i> Включить
+                                                    {% endif %}
+                                                </button>
+                                            </form>
+                                            <a href="{% url 'devices:device_detail' device.id %}" class="btn btn-sm btn-info" style="flex: 1;">
+                                                <i class="bi bi-eye"></i> Детали
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-muted small">
+                                        <i class="bi bi-clock"></i> Обновлено: {{ device.updated_at|date:"d.m.Y H:i" }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <h3>📭 В этой комнате нет устройств</h3>
+                            <p class="text-muted">Добавьте устройства в эту комнату через панель управления</p>
+                            <a href="{% url 'devices:device_list' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Перейти к устройствам
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.device-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.device-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.device-card .btn-group .btn {
+    border-radius: 0;
+}
+.device-card .btn-group .btn:first-child {
+    border-radius: 4px 0 0 4px;
+}
+.device-card .btn-group .btn:last-child {
+    border-radius: 0 4px 4px 0;
+}
+.progress {
+    background-color: #e9ecef;
+}
+.card-header {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Функция для обновления статистики
+function updateRoomStats() {
+    const cards = document.querySelectorAll('.device-card');
+    let onCount = 0;
+    let offCount = 0;
+    let onlineCount = 0;
+    let offlineCount = 0;
+
+    cards.forEach(card => {
+        const statusBadge = card.querySelector('.badge.bg-success, .badge.bg-secondary, .badge.bg-warning');
+        const onlineBadge = card.querySelector('.badge.bg-success, .badge.bg-danger');
+
+        // Подсчет статуса
+        if (statusBadge) {
+            const statusText = statusBadge.textContent.trim();
+            if (statusText === 'Включено') onCount++;
+            else if (statusText === 'Выключено') offCount++;
+        }
+
+        // Подсчет онлайн
+        if (onlineBadge) {
+            const onlineText = onlineBadge.textContent.trim();
+            if (onlineText.includes('В сети')) onlineCount++;
+            else offlineCount++;
+        }
+    });
+
+    // Обновляем отображение
+    document.getElementById('devicesOnCount').textContent = onCount;
+    document.getElementById('devicesOffCount').textContent = offCount;
+    document.getElementById('devicesOnlineCount').textContent = onlineCount;
+    document.getElementById('devicesOfflineCount').textContent = offlineCount;
+}
+
+// Включить все светильники в комнате
+function turnOnAllLights() {
+    if (confirm('Включить все светильники в этой комнате?')) {
+        const lightCards = document.querySelectorAll('[data-device-type="light"]');
+        lightCards.forEach(card => {
+            const toggleBtn = card.querySelector('form button');
+            if (toggleBtn && toggleBtn.textContent.includes('Включить')) {
+                toggleBtn.click();
+            }
+        });
+        setTimeout(updateRoomStats, 1000);
+    }
+}
+
+// Выключить все светильники в комнате
+function turnOffAllLights() {
+    if (confirm('Выключить все светильники в этой комнате?')) {
+        const lightCards = document.querySelectorAll('[data-device-type="light"]');
+        lightCards.forEach(card => {
+            const toggleBtn = card.querySelector('form button');
+            if (toggleBtn && toggleBtn.textContent.includes('Выключить')) {
+                toggleBtn.click();
+            }
+        });
+        setTimeout(updateRoomStats, 1000);
+    }
+}
+
+// Автоматическое обновление статистики при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    updateRoomStats();
+
+    // Обновляем статистику каждые 30 секунд
+    setInterval(updateRoomStats, 30000);
+});
+
+// Добавляем атрибут data-device-type для фильтрации
+document.querySelectorAll('.device-card').forEach(card => {
+    const typeBadge = card.querySelector('.bi-tag');
+    if (typeBadge) {
+        const parent = typeBadge.parentElement;
+        if (parent) {
+            const typeText = parent.textContent.trim();
+            if (typeText.includes('Свет')) {
+                card.setAttribute('data-device-type', 'light');
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

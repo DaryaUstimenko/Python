@@ -1,0 +1,559 @@
+<div class="washer-control">
+    <!-- Статус стирки -->
+    <div class="mb-3">
+        <div class="card bg-light">
+            <div class="card-body py-3">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <small class="text-muted">Статус</small>
+                        <h5 class="mb-0" id="washerStatus">
+                            {% if washer.is_running %}
+                            <span class="text-success">🔄 Стирка идет</span>
+                            {% else %}
+                            <span class="text-secondary">⏸ Остановлена</span>
+                            {% endif %}
+                        </h5>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Осталось</small>
+                        <h5 class="mb-0" id="timeRemaining">
+                            {% if washer.is_running %}
+                            {{ washer.time_remaining }} мин
+                            {% else %}
+                            --
+                            {% endif %}
+                        </h5>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Программа</small>
+                        <h5 class="mb-0" id="currentProgram">{{ washer.program_display }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Выбор программы -->
+    <div class="mb-3">
+        <label class="form-label">Программа стирки</label>
+        <div class="btn-group w-100 flex-wrap" role="group">
+            {% for program_value, program_label in washer.PROGRAMS %}
+            <button class="btn btn-sm {% if washer.program == program_value %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+                    onclick="setProgram('{{ program_value }}')" style="flex: 1; min-width: 70px;">
+                {% if program_value == 'cotton' %}👕
+                {% elif program_value == 'synthetic' %}🧥
+                {% elif program_value == 'delicate' %}👗
+                {% elif program_value == 'quick' %}⚡
+                {% elif program_value == 'wool' %}🧶
+                {% endif %}
+                {{ program_label }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Настройки температуры -->
+    <div class="mb-3">
+        <label class="form-label">Температура: <span id="tempValue">{{ washer.temperature }}°C</span></label>
+        <input type="range" class="form-range" id="tempSlider"
+               min="0" max="95" step="5" value="{{ washer.temperature }}"
+               oninput="updateTemperature(this.value)">
+        <div class="d-flex justify-content-between small text-muted">
+            <span>0°C</span>
+            <span>95°C</span>
+        </div>
+    </div>
+
+    <!-- Скорость отжима -->
+    <div class="mb-3">
+        <label class="form-label">Скорость отжима: <span id="spinSpeedValue">{{ washer.spin_speed }} об/мин</span></label>
+        <input type="range" class="form-range" id="spinSpeedSlider"
+               min="0" max="1400" step="100" value="{{ washer.spin_speed }}"
+               oninput="updateSpinSpeed(this.value)">
+        <div class="d-flex justify-content-between small text-muted">
+            <span>0</span>
+            <span>1400</span>
+        </div>
+    </div>
+
+    <!-- Кнопки управления -->
+    <div class="mb-3">
+        <div class="row">
+            <div class="col-6">
+                <div class="d-grid">
+                    {% if washer.is_running %}
+                    <button class="btn btn-danger" onclick="stopWash()">
+                        <i class="bi bi-stop-circle"></i> Остановить
+                    </button>
+                    {% else %}
+                    <button class="btn btn-success" onclick="startWash()"
+                            {% if device.status != 'on' %}disabled{% endif %}>
+                        <i class="bi bi-play-circle"></i> Запустить
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="d-grid">
+                    <button class="btn btn-outline-secondary" onclick="pauseWash()"
+                            {% if not washer.is_running %}disabled{% endif %}>
+                        <i class="bi bi-pause-circle"></i> Пауза
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% if device.status != 'on' %}
+        <small class="text-warning text-center d-block mt-2">
+            <i class="bi bi-exclamation-triangle"></i> Машина выключена! Включите устройство.
+        </small>
+        {% endif %}
+    </div>
+
+    <!-- Дополнительные настройки -->
+    <div class="mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="extraRinse"
+                                   {% if washer.extra_rinse %}checked{% endif %} onchange="toggleExtraRinse()">
+                            <label class="form-check-label" for="extraRinse">
+                                <i class="bi bi-droplet"></i> Доп. полоскание
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="preWash"
+                                   {% if washer.pre_wash %}checked{% endif %} onchange="togglePreWash()">
+                            <label class="form-check-label" for="preWash">
+                                <i class="bi bi-clock"></i> Предварительная стирка
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Прогресс стирки -->
+    {% if washer.is_running %}
+    <div class="mb-3">
+        <label class="form-label">Прогресс стирки</label>
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                 role="progressbar" id="washProgress" style="width: 0%">
+                <span id="progressText">0%</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Статистика -->
+    <div class="mt-3">
+        <div class="card bg-light">
+            <div class="card-body py-2">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <small class="text-muted">Всего стирок</small>
+                        <h6 class="mb-0" id="totalWashes">0</h6>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Сегодня</small>
+                        <h6 class="mb-0" id="todayWashes">0</h6>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Последняя</small>
+                        <h6 class="mb-0" id="lastWash">--</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Переменные для статистики
+let totalWashes = parseInt(localStorage.getItem('washerTotalWashes') || '0');
+let todayWashes = parseInt(localStorage.getItem('washerTodayWashes') || '0');
+let lastWash = localStorage.getItem('washerLastWash') || '--';
+
+// Переменные для имитации прогресса
+let progressInterval = null;
+let currentProgress = 0;
+
+// Обновляем отображение статистики
+document.getElementById('totalWashes').textContent = totalWashes;
+document.getElementById('todayWashes').textContent = todayWashes;
+document.getElementById('lastWash').textContent = lastWash;
+
+function updateTemperature(value) {
+    document.getElementById('tempValue').textContent = value + '°C';
+}
+
+function updateSpinSpeed(value) {
+    document.getElementById('spinSpeedValue').textContent = value + ' об/мин';
+}
+
+function setProgram(program) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'set_program',
+            program: program
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('success', data.message);
+            // Обновляем активную кнопку
+            document.querySelectorAll('.washer-control .btn-group .btn').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-secondary');
+            });
+            document.querySelector(`.washer-control .btn-group .btn[onclick="setProgram('${program}')"]`)
+                .classList.replace('btn-outline-secondary', 'btn-primary');
+            document.getElementById('currentProgram').textContent = data.program_display || program;
+        } else {
+            showNotification('danger', data.error || 'Ошибка при установке программы');
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+    });
+}
+
+function startWash() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+
+    // Получаем текущие настройки
+    const temperature = document.getElementById('tempSlider').value;
+    const spinSpeed = document.getElementById('spinSpeedSlider').value;
+    const extraRinse = document.getElementById('extraRinse').checked;
+    const preWash = document.getElementById('preWash').checked;
+
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Запуск...';
+    button.disabled = true;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'start_wash',
+            temperature: parseInt(temperature),
+            spin_speed: parseInt(spinSpeed),
+            extra_rinse: extraRinse,
+            pre_wash: preWash
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('success', '🧺 ' + data.message);
+
+            // Обновляем статистику
+            totalWashes++;
+            todayWashes++;
+            const now = new Date();
+            lastWash = now.toLocaleTimeString();
+
+            localStorage.setItem('washerTotalWashes', totalWashes.toString());
+            localStorage.setItem('washerTodayWashes', todayWashes.toString());
+            localStorage.setItem('washerLastWash', lastWash);
+
+            document.getElementById('totalWashes').textContent = totalWashes;
+            document.getElementById('todayWashes').textContent = todayWashes;
+            document.getElementById('lastWash').textContent = lastWash;
+
+            // Обновляем интерфейс
+            document.getElementById('washerStatus').innerHTML = '<span class="text-success">🔄 Стирка идет</span>';
+            document.getElementById('timeRemaining').textContent = data.time_remaining + ' мин';
+
+            // Заменяем кнопку
+            button.outerHTML = `
+                <button class="btn btn-danger" onclick="stopWash()">
+                    <i class="bi bi-stop-circle"></i> Остановить
+                </button>
+            `;
+
+            // Запускаем прогресс
+            startProgress(data.time_remaining);
+
+            // Обновляем статус устройства
+            location.reload();
+        } else {
+            showNotification('danger', data.error || 'Ошибка при запуске стирки');
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+function stopWash() {
+    if (confirm('Остановить стирку?')) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Остановка...';
+        button.disabled = true;
+
+        fetch('{% url "devices:control_device" device.id %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                action: 'stop_wash'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('success', '⏹️ ' + data.message);
+
+                // Останавливаем прогресс
+                stopProgress();
+
+                // Обновляем интерфейс
+                document.getElementById('washerStatus').innerHTML = '<span class="text-secondary">⏸ Остановлена</span>';
+                document.getElementById('timeRemaining').textContent = '--';
+
+                // Заменяем кнопку
+                button.outerHTML = `
+                    <button class="btn btn-success" onclick="startWash()" ${'{% if device.status != "on" %}'}disabled${'{% endif %}'}>
+                        <i class="bi bi-play-circle"></i> Запустить
+                    </button>
+                `;
+            } else {
+                showNotification('danger', data.error || 'Ошибка при остановке стирки');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            showNotification('danger', 'Ошибка сети: ' + error.message);
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
+}
+
+function pauseWash() {
+    showNotification('info', '⏸ Стирка поставлена на паузу');
+    // Здесь можно добавить реальную логику паузы
+    document.getElementById('washerStatus').innerHTML = '<span class="text-warning">⏸ На паузе</span>';
+}
+
+function toggleExtraRinse() {
+    const checked = document.getElementById('extraRinse').checked;
+    showNotification('info', `Дополнительное полоскание ${checked ? 'включено' : 'выключено'}`);
+}
+
+function togglePreWash() {
+    const checked = document.getElementById('preWash').checked;
+    showNotification('info', `Предварительная стирка ${checked ? 'включена' : 'выключена'}`);
+}
+
+function startProgress(timeRemaining) {
+    currentProgress = 0;
+    const totalTime = timeRemaining * 60; // переводим в секунды
+    const step = 100 / totalTime;
+
+    if (progressInterval) {
+        clearInterval(progressInterval);
+    }
+
+    progressInterval = setInterval(() => {
+        currentProgress += step;
+        if (currentProgress >= 100) {
+            currentProgress = 100;
+            clearInterval(progressInterval);
+            progressInterval = null;
+
+            // Стирка завершена
+            document.getElementById('washerStatus').innerHTML = '<span class="text-success">✅ Стирка завершена</span>';
+            showNotification('success', '🧺 Стирка завершена!');
+
+            // Обновляем интерфейс через 5 секунд
+            setTimeout(() => {
+                location.reload();
+            }, 5000);
+        }
+
+        document.getElementById('washProgress').style.width = currentProgress + '%';
+        document.getElementById('progressText').textContent = Math.round(currentProgress) + '%';
+
+        // Обновляем оставшееся время
+        const remaining = Math.round((100 - currentProgress) / 100 * totalTime / 60);
+        document.getElementById('timeRemaining').textContent = remaining + ' мин';
+    }, 1000);
+}
+
+function stopProgress() {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+    }
+}
+
+function showNotification(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    const container = document.querySelector('.container-fluid');
+    if (container) {
+        container.prepend(alertDiv);
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+}
+
+// Сброс счетчика сегодняшних стирок при полуночи
+function resetDailyCounter() {
+    const now = new Date();
+    const lastReset = localStorage.getItem('washerLastReset');
+    const today = now.toDateString();
+
+    if (lastReset !== today) {
+        todayWashes = 0;
+        localStorage.setItem('washerTodayWashes', '0');
+        localStorage.setItem('washerLastReset', today);
+        document.getElementById('todayWashes').textContent = '0';
+    }
+}
+
+// Проверяем сброс счетчика при загрузке
+resetDailyCounter();
+
+// Проверяем каждую минуту
+setInterval(resetDailyCounter, 60000);
+</script>
+
+<style>
+.washer-control .btn-group .btn {
+    flex: 1;
+    transition: all 0.3s ease;
+}
+
+.washer-control .btn-group .btn:hover {
+    transform: translateY(-2px);
+}
+
+.washer-control .progress {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+}
+
+.washer-control .progress-bar {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    transition: width 0.5s ease;
+    line-height: 20px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.washer-control .btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+}
+
+.washer-control .btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0e7a72 0%, #2dbd66 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+}
+
+.washer-control .btn-danger {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    border: none;
+}
+
+.washer-control .btn-danger:hover {
+    background: linear-gradient(135deg, #c92a3e 0%, #d94d35 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(235, 51, 73, 0.3);
+}
+
+.washer-control .btn-outline-secondary.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-color: transparent;
+}
+
+.washer-control .btn-outline-secondary:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.washer-control .card {
+    border: none;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+.washer-control .form-range::-webkit-slider-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.washer-control .form-range::-moz-range-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.washer-control .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+/* Анимация для работающей стиральной машины */
+@keyframes washPulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.washer-control .text-success {
+    animation: washPulse 2s infinite;
+}
+
+/* Анимация для прогресс-бара */
+.washer-control .progress-bar-striped {
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 1rem 1rem;
+}
+</style>

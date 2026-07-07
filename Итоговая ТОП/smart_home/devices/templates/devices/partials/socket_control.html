@@ -1,0 +1,252 @@
+<div class="mb-3">
+    <label class="form-label">Мощность: <span id="powerValue">{{ socket.power_consumption|default:"0" }} Вт</span></label>
+    <input type="range" class="form-range" id="powerSlider"
+           min="0" max="100" value="{{ socket.power_consumption|default:"0" }}"
+           oninput="updatePower(this.value)">
+    <button class="btn btn-sm btn-primary mt-2" onclick="setPower()">
+        <i class="bi bi-check"></i> Применить
+    </button>
+</div>
+
+<div class="mb-3">
+    <div class="row">
+        <div class="col-6">
+            <label class="form-label">Напряжение</label>
+            <div class="input-group">
+                <span class="input-group-text">⚡</span>
+                <input type="number" class="form-control" id="voltageInput"
+                       value="{{ socket.voltage|default:"220" }}" min="100" max="250">
+                <span class="input-group-text">В</span>
+            </div>
+        </div>
+        <div class="col-6">
+            <label class="form-label">Ток</label>
+            <div class="input-group">
+                <span class="input-group-text">🔌</span>
+                <input type="number" class="form-control" id="currentInput"
+                       value="{{ socket.current|default:"0" }}" min="0" max="16" step="0.1">
+                <span class="input-group-text">А</span>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-sm btn-primary mt-2" onclick="setElectricalParams()">
+        <i class="bi bi-check"></i> Применить параметры
+    </button>
+</div>
+
+<div class="mb-3">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="childLockSwitch"
+               {% if socket.is_child_lock %}checked{% endif %} onchange="toggleChildLock()">
+        <label class="form-check-label" for="childLockSwitch">
+            <i class="bi bi-shield-lock"></i> Защита от детей
+        </label>
+    </div>
+</div>
+
+<div class="mb-3">
+    <div class="row text-center">
+        <div class="col-4">
+            <div class="card bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted">Мощность</small>
+                    <h5 class="mb-0" id="displayPower">{{ socket.power_consumption|default:"0" }} Вт</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted">Напряжение</small>
+                    <h5 class="mb-0" id="displayVoltage">{{ socket.voltage|default:"220" }} В</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted">Ток</small>
+                    <h5 class="mb-0" id="displayCurrent">{{ socket.current|default:"0" }} А</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3">
+    <div class="d-grid gap-2">
+        <button class="btn btn-outline-danger" onclick="resetSocket()">
+            <i class="bi bi-arrow-counterclockwise"></i> Сбросить настройки
+        </button>
+    </div>
+</div>
+
+<script>
+function updatePower(value) {
+    document.getElementById('powerValue').textContent = value + ' Вт';
+}
+
+function setPower() {
+    const value = document.getElementById('powerSlider').value;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'set_power',
+            power: parseInt(value)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('displayPower').textContent = value + ' Вт';
+            showNotification('success', data.message);
+        } else {
+            showNotification('danger', data.error || 'Ошибка при установке мощности');
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+    });
+}
+
+function setElectricalParams() {
+    const voltage = document.getElementById('voltageInput').value;
+    const current = document.getElementById('currentInput').value;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    if (voltage < 100 || voltage > 250) {
+        showNotification('warning', 'Напряжение должно быть в диапазоне 100-250 В');
+        return;
+    }
+
+    if (current < 0 || current > 16) {
+        showNotification('warning', 'Ток должен быть в диапазоне 0-16 А');
+        return;
+    }
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'set_electrical_params',
+            voltage: parseFloat(voltage),
+            current: parseFloat(current)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('displayVoltage').textContent = voltage + ' В';
+            document.getElementById('displayCurrent').textContent = current + ' А';
+            showNotification('success', data.message);
+        } else {
+            showNotification('danger', data.error || 'Ошибка при установке параметров');
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+    });
+}
+
+function toggleChildLock() {
+    const isChecked = document.getElementById('childLockSwitch').checked;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "devices:control_device" device.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'toggle_child_lock',
+            enabled: isChecked
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('success', data.message);
+        } else {
+            showNotification('danger', data.error || 'Ошибка при переключении защиты');
+            // Возвращаем переключатель в исходное состояние
+            document.getElementById('childLockSwitch').checked = !isChecked;
+        }
+    })
+    .catch(error => {
+        showNotification('danger', 'Ошибка сети: ' + error.message);
+        document.getElementById('childLockSwitch').checked = !isChecked;
+    });
+}
+
+function resetSocket() {
+    if (confirm('Сбросить все настройки розетки на значения по умолчанию?')) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch('{% url "devices:control_device" device.id %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                action: 'reset_socket'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Сбрасываем значения на форме
+                document.getElementById('powerSlider').value = 0;
+                document.getElementById('powerValue').textContent = '0 Вт';
+                document.getElementById('voltageInput').value = 220;
+                document.getElementById('currentInput').value = 0;
+                document.getElementById('childLockSwitch').checked = false;
+
+                document.getElementById('displayPower').textContent = '0 Вт';
+                document.getElementById('displayVoltage').textContent = '220 В';
+                document.getElementById('displayCurrent').textContent = '0 А';
+
+                showNotification('success', data.message);
+            } else {
+                showNotification('danger', data.error || 'Ошибка при сбросе настроек');
+            }
+        })
+        .catch(error => {
+            showNotification('danger', 'Ошибка сети: ' + error.message);
+        });
+    }
+}
+
+// Функция для отображения уведомлений
+function showNotification(type, message) {
+    // Создаем уведомление
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    // Добавляем в начало контейнера
+    const container = document.querySelector('.container-fluid');
+    if (container) {
+        container.prepend(alertDiv);
+
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+}
+</script>
