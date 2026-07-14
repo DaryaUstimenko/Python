@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список регионов</title>
+</head>
+<body>
+    <h1>Список регионов</h1>
+    <ul>
+        {% for region in regions %}
+            <li><a href="{% url 'region_detail' region %}">{{ region }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

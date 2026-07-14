@@ -1,0 +1,45 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+<h2>{{ article.title }}</h2>
+<p><strong>Автор:</strong> {{ article.author.username }} | <strong>Дата:</strong> {{ article.publication_date|date:"d.m.Y H:i" }}</p>
+<p class="tags"><strong>Теги:</strong> 
+    {% for tag in article.tags.all %}
+        {{ tag.name }}{% if not forloop.last %}, {% endif %}
+    {% empty %}нет тегов{% endfor %}
+</p>
+<div>{{ article.text|linebreaks }}</div>
+
+{% if user.is_authenticated %}
+    <div>
+        {% if saved %}
+            <a href="{% url 'unsave_article' article.slug %}">Удалить из сохранённых</a>
+        {% else %}
+            <a href="{% url 'save_article' article.slug %}">Сохранить для дальнейшего чтения</a>
+        {% endif %}
+    </div>
+{% endif %}
+
+<h3>Комментарии ({{ comments.count }})</h3>
+{% for comment in comments %}
+    <div class="comment">
+        <strong>{{ comment.user.username }}</strong> ({{ comment.created_at|date:"d.m.Y H:i" }})<br>
+        {{ comment.text|linebreaks }}
+    </div>
+{% empty %}
+    <p>Пока нет комментариев. Будьте первым!</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+    <h4>Добавить комментарий</h4>
+    <form method="post" action="{% url 'add_comment' article.slug %}">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit">Отправить</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}?next={{ request.path }}">Войдите</a>, чтобы оставить комментарий.</p>
+{% endif %}
+
+<p><a href="{% url 'article_list' %}">Назад к списку статей</a></p>
+{% endblock %}

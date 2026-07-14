@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Список продаж</title>
+</head>
+<body>
+    <h1>Список продаж</h1>
+    <ul>
+        {% for sale in sales %}
+            <li>Покупатель: {{ sale.customer.first_name }} {{ sale.customer.last_name }} - Продавец: {{ sale.seller.first_name }} {{ sale.seller.last_name }} - Товар: {{ sale.product.name }} - Дата продажи: {{ sale.sale_date }} - Сумма продажи: {{ sale.sale_amount }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'admin:index' %}">Назад в админку</a>
+</body>
+</html>

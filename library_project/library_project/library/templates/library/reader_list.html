@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список читателей</title>
+</head>
+<body>
+    <h1>Список читателей</h1>
+    <ul>
+        {% for reader in readers %}
+            <li><a href="{% url 'reader_detail' reader.pk %}">{{ reader.first_name }} {{ reader.last_name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

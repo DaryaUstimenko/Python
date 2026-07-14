@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Книги в наличии</title>
+</head>
+<body>
+    <h1>Книги в наличии</h1>
+    <ul>
+        {% for book in books %}
+            <li>{{ book.title }} ({{ book.author }}) - {{ book.publisher }} ({{ book.publication_year }})</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'all_books' %}">Показать все книги</a>
+</body>
+</html>

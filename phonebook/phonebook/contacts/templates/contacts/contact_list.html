@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Телефонная книга</title>
+</head>
+<body>
+    <h1>Список контактов</h1>
+    <ul>
+        {% for contact in contacts %}
+            <li>
+                {{ contact.first_name }} {{ contact.last_name }} - {{ contact.email }} - {{ contact.phone }} - {{ contact.note }}
+                <a href="{% url 'contact_delete' contact.id %}">Удалить</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'contact_create' %}">Добавить контакт</a>
+</body>
+</html>

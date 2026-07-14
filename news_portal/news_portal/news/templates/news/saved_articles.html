@@ -1,0 +1,14 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+<h2>Мои сохранённые статьи</h2>
+{% for saved in saved_articles %}
+    <div class="article">
+        <h3><a href="{{ saved.article.get_absolute_url }}">{{ saved.article.title }}</a></h3>
+        <p><strong>Автор:</strong> {{ saved.article.author.username }} | <strong>Дата:</strong> {{ saved.article.publication_date|date:"d.m.Y H:i" }}</p>
+        <p><small>Сохранено: {{ saved.saved_at|date:"d.m.Y H:i" }}</small></p>
+    </div>
+{% empty %}
+    <p>У вас пока нет сохранённых статей.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,94 @@
+2026-06-15 15:48:44,580 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 15:49:36,670 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 15:51:11,066 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 15:53:53,602 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 15:55:02,574 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 15:56:25,827 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 15:59:04,336 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 16:00:32,301 - __main__ - INFO - Бот запущен
+2026-06-15 16:00:33,414 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getMe "HTTP/1.1 200 OK"
+2026-06-15 16:00:33,528 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/setMyCommands "HTTP/1.1 200 OK"
+2026-06-15 16:00:33,617 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/deleteWebhook "HTTP/1.1 200 OK"
+2026-06-15 16:00:33,620 - telegram.ext.Application - INFO - Application started
+2026-06-15 16:00:44,141 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:00:46,314 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:00:46,316 - __main__ - INFO - Получено сообщение от 1997577638: start
+2026-06-15 16:00:46,880 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:00:52,675 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:00:52,679 - __main__ - INFO - Получено сообщение от 1997577638: Help
+2026-06-15 16:00:53,248 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:01:02,771 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:12,863 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:22,951 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:27,024 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:27,026 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2026-06-15 16:01:27,026 - telegram.ext.Application - INFO - Application.stop() complete
+2026-06-15 16:01:28,055 - __main__ - INFO - Бот запущен
+2026-06-15 16:01:28,624 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getMe "HTTP/1.1 200 OK"
+2026-06-15 16:01:28,725 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/setMyCommands "HTTP/1.1 200 OK"
+2026-06-15 16:01:28,825 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/deleteWebhook "HTTP/1.1 200 OK"
+2026-06-15 16:01:28,828 - telegram.ext.Application - INFO - Application started
+2026-06-15 16:01:39,349 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:49,442 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:50,189 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:50,190 - __main__ - INFO - Пользователь 1997577638 запустил бота
+2026-06-15 16:01:50,839 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:01:54,459 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:54,462 - __main__ - INFO - Пользователь 1997577638 запросил помощь
+2026-06-15 16:01:54,582 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:01:59,193 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:01:59,195 - __main__ - INFO - Пользователь 1997577638 запустил бота
+2026-06-15 16:01:59,317 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:02:03,792 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:02:03,798 - __main__ - INFO - Пользователь 1997577638 запросил помощь
+2026-06-15 16:02:03,930 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:02:13,891 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:02:23,982 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:02:27,402 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:02:27,403 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2026-06-15 16:02:27,403 - telegram.ext.Application - INFO - Application.stop() complete
+2026-06-15 16:02:28,429 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 16:02:54,821 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 16:07:40,788 - __main__ - CRITICAL - Критическая ошибка: 'NoneType' object has no attribute 'run_once'
+2026-06-15 16:08:07,966 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-06-15 16:08:07,966 - __main__ - INFO - Бот запущен
+2026-06-15 16:08:08,622 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getMe "HTTP/1.1 200 OK"
+2026-06-15 16:08:08,713 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/deleteWebhook "HTTP/1.1 200 OK"
+2026-06-15 16:08:08,715 - apscheduler.scheduler - INFO - Added job "<lambda>" to job store "default"
+2026-06-15 16:08:08,715 - apscheduler.scheduler - INFO - Scheduler started
+2026-06-15 16:08:08,715 - telegram.ext.Application - INFO - Application started
+2026-06-15 16:08:08,716 - apscheduler.scheduler - INFO - Removed job 32dc8f5ffff942cf9076130e315f96fe
+2026-06-15 16:08:08,716 - apscheduler.executors.default - INFO - Running job "<lambda> (trigger: date[2026-06-15 13:08:07 UTC], next run at: 2026-06-15 13:08:07 UTC)" (scheduled at 2026-06-15 13:08:07.965759+00:00)
+2026-06-15 16:08:08,851 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/setMyCommands "HTTP/1.1 200 OK"
+2026-06-15 16:08:08,869 - apscheduler.executors.default - INFO - Job "<lambda> (trigger: date[2026-06-15 13:08:07 UTC], next run at: 2026-06-15 13:08:07 UTC)" executed successfully
+2026-06-15 16:08:19,304 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:27,819 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:27,820 - __main__ - INFO - Пользователь 1997577638 запустил бота
+2026-06-15 16:08:28,391 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:08:31,412 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:31,413 - __main__ - INFO - Пользователь 1997577638 запросил помощь
+2026-06-15 16:08:31,622 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:08:41,500 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:44,199 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:44,202 - __main__ - INFO - Пользователь 1997577638 открыл меню
+2026-06-15 16:08:44,922 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:08:52,432 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:52,434 - __main__ - INFO - Получено сообщение от 1997577638: \u2139\ufe0f О боте
+2026-06-15 16:08:53,087 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:08:55,465 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:55,466 - __main__ - INFO - Получено сообщение от 1997577638: \U0001f4ca Статистика
+2026-06-15 16:08:55,576 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:08:57,087 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:57,090 - __main__ - INFO - Получено сообщение от 1997577638: \U0001f4dd Помощь
+2026-06-15 16:08:57,090 - __main__ - INFO - Пользователь 1997577638 запросил помощь
+2026-06-15 16:08:57,208 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:08:58,807 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:08:58,810 - __main__ - INFO - Получено сообщение от 1997577638: \u2699\ufe0f Настройки
+2026-06-15 16:08:58,934 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:09:08,901 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:09:09,730 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:09:10,303 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/sendMessage "HTTP/1.1 200 OK"
+2026-06-15 16:09:18,055 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8324467854:AAEdzkM_2e6z3WVyO0zb6UTZxR4Ws1np-ZY/getUpdates "HTTP/1.1 200 OK"
+2026-06-15 16:09:18,057 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2026-06-15 16:09:18,057 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2026-06-15 16:09:18,069 - telegram.ext.Application - INFO - Application.stop() complete

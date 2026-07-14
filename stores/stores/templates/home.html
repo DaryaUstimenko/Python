@@ -1,0 +1,182 @@
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        margin-bottom: 40px;
+    }
+
+    .hero h1 {
+        font-size: 2.5em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .hero p {
+        font-size: 1.2em;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin: 40px 0;
+    }
+
+    .app-button {
+        flex: 1;
+        min-width: 250px;
+        padding: 40px 20px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .app-button:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    .button-icon {
+        font-size: 4em;
+        margin-bottom: 20px;
+    }
+
+    .button-title {
+        font-size: 1.8em;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .button-description {
+        font-size: 0.9em;
+        opacity: 0.9;
+    }
+
+    .button1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .button2 {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .button3 {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+        padding-top: 40px;
+        border-top: 2px solid #eee;
+    }
+
+    .feature {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .feature-icon {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+    }
+
+    .feature h3 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .feature p {
+        color: #666;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 1.8em;
+        }
+
+        .buttons-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-button {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Добро пожаловать в наш проект! 🎉</h1>
+    <p>Проект состоит из трех приложений. Выберите нужное приложение, нажав на кнопку ниже</p>
+</div>
+
+<div class="buttons-container">
+    <a href="{% url 'app1:index' %}" class="app-button button1">
+        <div class="button-icon">📱</div>
+        <div class="button-title">Приложение 1</div>
+        <div class="button-description">
+            Таблица умножения<br>
+            Интерактивная таблица
+        </div>
+    </a>
+
+    <a href="http://127.0.0.1:8000/" class="app-button button2">
+        <div class="button-icon">📅</div>
+        <div class="button-title">Приложение 2</div>
+        <div class="button-description">
+            День программиста<br>
+            256-й день года
+        </div>
+    </a>
+
+    <a href="{% url 'app3:index' %}" class="app-button button3">
+        <div class="button-icon">🕐</div>
+        <div class="button-title">Приложение 3</div>
+        <div class="button-description">
+            Текущие дата и время<br>
+            Часы реального времени
+        </div>
+    </a>
+</div>
+
+<div class="features">
+    <div class="feature">
+        <div class="feature-icon">✨</div>
+        <h3>Удобный интерфейс</h3>
+        <p>Интуитивно понятный дизайн и простая навигация между приложениями</p>
+    </div>
+    <div class="feature">
+        <div class="feature-icon">🚀</div>
+        <h3>Быстрая работа</h3>
+        <p>Оптимизированный код и мгновенный отклик на действия пользователя</p>
+    </div>
+    <div class="feature">
+        <div class="feature-icon">📱</div>
+        <h3>Адаптивный дизайн</h3>
+        <p>Корректное отображение на всех устройствах - от телефонов до ПК</p>
+    </div>
+</div>
+{% endblock %}

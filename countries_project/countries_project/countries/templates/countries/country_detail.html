@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Информация о стране</title>
+</head>
+<body>
+    <h1>{{ country.name.common }}</h1>
+    <p><strong>Столица:</strong> <a href="{% url 'city_detail' country.capital.0 %}">{{ country.capital.0 }}</a></p>
+    <p><strong>Регион:</strong> {{ country.region }}</p>
+    <p><strong>Население:</strong> {{ country.population }}</p>
+    <p><strong>Площадь:</strong> {{ country.area }} кв. км</p>
+    <p><strong>Временные пояса:</strong> {{ country.timezones|join:", " }}</p>
+    <p><strong>Языки:</strong> {{ country.languages|join:", " }}</p>
+    <a href="{% url 'country_list' %}">Вернуться к списку стран</a>
+</body>
+</html>
+

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Информация о читателе</title>
+</head>
+<body>
+    <h1>{{ reader.first_name }} {{ reader.last_name }}</h1>
+    <p>Телефон: {{ reader.contact_phone }}</p>
+    <p>Email: {{ reader.email }}</p>
+    <p>Дата приема: {{ reader.membership_date }}</p>
+    <h2>Книги на руках:</h2>
+    <ul>
+        {% for book in reader.borrowed_books.all %}
+            <li>{{ book.title }} ({{ book.author }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

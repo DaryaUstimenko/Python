@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Список продавцов</title>
+</head>
+<body>
+    <h1>Список продавцов</h1>
+    <ul>
+        {% for seller in sellers %}
+            <li>{{ seller.first_name }} {{ seller.last_name }} - {{ seller.phone }} - {{ seller.email }} - {{ seller.position }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'admin:index' %}">Назад в админку</a>
+</body>
+</html>

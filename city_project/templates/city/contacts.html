@@ -1,0 +1,45 @@
+<!-- templates/city/contacts.html -->
+{% extends 'city/base.html' %}
+
+{% block content %}
+<h1 class="page-title">📞 Контактные телефоны городских служб</h1>
+
+<div style="margin-bottom: 30px;">
+    <h2 style="color: #e74c3c; margin-bottom: 20px;">🚨 Экстренные службы (24/7)</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+        {% for service in emergency_services %}
+        <div style="background: #fee; padding: 15px; border-radius: 10px; border-left: 4px solid #e74c3c;">
+            <div style="font-size: 1.5em; margin-bottom: 5px;">{{ service.icon }}</div>
+            <div style="font-weight: bold; font-size: 1.2em;">{{ service.name }}</div>
+            <div style="color: #e74c3c; font-size: 1.5em; font-weight: bold; margin: 10px 0;">{{ service.phone }}</div>
+            <div style="color: #666; font-size: 0.9em;">{{ service.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div>
+    <h2 style="color: #3498db; margin-bottom: 20px;">🏢 Городские службы</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+        {% for service in city_services %}
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+            <div style="font-size: 1.5em; margin-bottom: 5px;">{{ service.icon }}</div>
+            <div style="font-weight: bold;">{{ service.name }}</div>
+            <div style="color: #3498db; font-size: 1.2em; margin: 5px 0;">{{ service.phone }}</div>
+            <div style="color: #999; font-size: 0.85em;">{{ service.hours }}</div>
+            <div style="color: #666; font-size: 0.9em; margin-top: 5px;">{{ service.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background: #e8f4f8; border-radius: 10px;">
+    <h3>📌 Важная информация</h3>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+        <li>📞 Звонки на короткие номера (101, 102, 103, 104, 112) бесплатны</li>
+        <li>🔄 Единая служба спасения "112" работает во всех регионах РФ</li>
+        <li>⏰ Городские службы работают в будние дни с 9:00 до 18:00</li>
+        <li>🚨 В экстренных случаях звоните по номерам 112, 101, 102, 103</li>
+    </ul>
+</div>
+{% endblock %}c

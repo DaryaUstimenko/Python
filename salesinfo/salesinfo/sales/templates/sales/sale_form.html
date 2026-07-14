@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить продажу</title>
+</head>
+<body>
+    <h1>Добавить продажу</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить</button>
+    </form>
+    <a href="{% url 'sale_list' %}">Вернуться к списку продаж</a>
+</body>
+</html>

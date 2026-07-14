@@ -1,0 +1,97 @@
+<!-- templates/city/history_people.html -->
+{% extends 'city/base.html' %}
+
+{% block extra_css %}
+<style>
+    .person-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .person-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    }
+
+    .person-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+    }
+
+    .person-quote {
+        font-style: italic;
+        padding: 15px;
+        background: #f8f9fa;
+        border-left: 3px solid #667eea;
+        margin: 15px 0;
+    }
+
+    .achievement-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .achievement-list li {
+        padding: 5px 0;
+        padding-left: 25px;
+        position: relative;
+    }
+
+    .achievement-list li:before {
+        content: "✓";
+        color: #667eea;
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">👥 Известные жители города</h1>
+
+<div style="margin-bottom: 20px; color: #666;">
+    Всего {{ total_people }} знаменитых личностей, связанных с историей нашего города
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+    {% for person in famous_people %}
+    <div class="person-card">
+        <div class="person-header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 3em;">{{ person.image_icon }}</div>
+                <div>
+                    <h2 style="margin: 0;">{{ person.name }}</h2>
+                    <div style="opacity: 0.9;">{{ person.title }} | {{ person.years }}</div>
+                </div>
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            <p style="color: #555; line-height: 1.6;">{{ person.description }}</p>
+
+            <div class="person-quote">
+                "{{ person.quote }}"
+            </div>
+
+            <h4>Основные достижения:</h4>
+            <ul class="achievement-list">
+                {% for achievement in person.achievements %}
+                <li>{{ achievement }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 40px; padding: 20px; background: #e8f4f8; border-radius: 10px;">
+    <h3>🏛️ Памятные места</h3>
+    <p>В городе установлены памятники, мемориальные доски и названы улицы в честь этих выдающихся людей.</p>
+    <p>📍 Экскурсионные маршруты "По следам великих людей" проводятся каждую субботу</p>
+</div>
+{% endblock %}

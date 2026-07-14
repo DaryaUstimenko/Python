@@ -1,0 +1,42 @@
+<!-- templates/city/government.html -->
+{% extends 'city/base.html' %}
+
+{% block content %}
+<h1 class="page-title">👥 Руководство города</h1>
+
+<div style="margin-bottom: 20px; color: #666;">
+    Всего руководителей: {{ total_officials }}
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+    {% for official in officials %}
+    <div style="background: #f8f9fa; border-radius: 15px; overflow: hidden; transition: transform 0.3s;">
+        <div style="text-align: center; padding: 20px;">
+            <div style="width: 150px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 3em;">
+                👤
+            </div>
+            <h3 style="color: #333;">{{ official.name }}</h3>
+            <div style="color: #667eea; font-weight: bold; margin: 10px 0;">{{ official.position }}</div>
+            <div style="margin: 10px 0;">
+                <div>📧 {{ official.email }}</div>
+                <div>📞 {{ official.phone }}</div>
+            </div>
+            <p style="color: #666; font-size: 0.9em; margin-top: 10px;">{{ official.bio }}</p>
+            <div style="margin-top: 15px; text-align: left;">
+                <strong>Курирует:</strong>
+                <ul style="margin-top: 5px; margin-left: 20px;">
+                    {% for responsibility in official.responsibilities %}
+                    <li>{{ responsibility }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 30px; text-align: center; padding: 20px; background: #e8f4f8; border-radius: 10px;">
+    <p>🏛️ Приемная мэра: <strong>г. Москва, ул. Тверская, д. 13</strong></p>
+    <p>📅 Часы приема: <strong>Вторник, четверг с 14:00 до 18:00</strong></p>
+</div>
+{% endblock %}

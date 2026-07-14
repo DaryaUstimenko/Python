@@ -1,0 +1,65 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+<h2>Все статьи</h2>
+
+<!-- Поиск -->
+<form method="get" action="">
+    <input type="text" name="q" placeholder="Поиск по заголовку или тексту" value="{{ search_query }}">
+    <button type="submit">Искать</button>
+</form>
+
+<!-- Сортировка -->
+<div>
+    <strong>Сортировать:</strong>
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}sort=date_desc">Новые сначала</a> |
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}sort=date_asc">Старые сначала</a> |
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}sort=author">По автору (А-Я)</a>
+</div>
+
+<!-- Фильтр по тегам -->
+<div>
+    <strong>Теги:</strong>
+    <a href="?">Все</a>
+    {% for tag in all_tags %}
+        <a href="?tag={{ tag.slug }}">{{ tag.name }}</a>
+    {% endfor %}
+    {% if selected_tag %} | Выбран: {{ selected_tag.name }}{% endif %}
+</div>
+
+<hr>
+
+{% for article in articles %}
+    <div class="article">
+        <h3><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h3>
+        <p><strong>Автор:</strong> {{ article.author.username }} | <strong>Дата:</strong> {{ article.publication_date|date:"d.m.Y H:i" }}</p>
+        <p class="tags"><strong>Теги:</strong> 
+            {% for tag in article.tags.all %}
+                {{ tag.name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}нет тегов{% endfor %}
+        </p>
+        <p>{{ article.text|truncatewords:30 }}</p>
+        {% if not article.is_public and not user.is_authenticated %}
+            <em>(Только для зарегистрированных)</em>
+        {% endif %}
+    </div>
+{% empty %}
+    <p>Статей не найдено.</p>
+{% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+        {% endif %}
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}

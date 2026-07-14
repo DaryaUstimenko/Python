@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Спорт{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            max-width: 800px;
+            width: 90%;
+            margin: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #007BFF, #00d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            font-weight: 700;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .message {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        /* Навигация - красивые кнопки */
+        .sport-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .sport-link {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .sport-link button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .sport-link button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .sport-link button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .sport-link button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .sport-link button:active {
+            transform: translateY(0);
+        }
+
+        /* Индивидуальные цвета для разных видов спорта */
+        .sport-link.home button {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .sport-link.football button {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .sport-link.hockey button {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .sport-link.basketball button {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
+        }
+
+        /* Анимации */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .message {
+                font-size: 1em;
+            }
+
+            .sport-link button {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+
+            .sport-nav {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{% block heading %}🏃 Добро пожаловать в мир спорта!{% endblock %}</h1>
+        <p class="message">{% block message %}Выберите интересующий раздел{% endblock %}</p>
+
+        <div class="sport-nav">
+            <a href="{% url 'hello_en' %}" class="sport-link home">
+                <button>🏠 Главная</button>
+            </a>
+            <a href="{% url 'football' %}" class="sport-link football">
+                <button>⚽ Футбол</button>
+            </a>
+            <a href="{% url 'hockey' %}" class="sport-link hockey">
+                <button>🏒 Хоккей</button>
+            </a>
+            <a href="{% url 'basketball' %}" class="sport-link basketball">
+                <button>🏀 Баскетбол</button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

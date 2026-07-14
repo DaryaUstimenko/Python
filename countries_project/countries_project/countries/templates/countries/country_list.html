@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список стран</title>
+</head>
+<body>
+    <h1>Список стран</h1>
+
+    {% if countries %}
+        <ul>
+            {% for country in countries %}
+                <li>
+                    {% if country.name and country.name.common %}
+                        {{ country.name.common }}
+                    {% elif country.name %}
+                        {{ country.name }}
+                    {% else %}
+                        Страна без названия
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет данных о странах. Попробуйте позже.</p>
+        <p>Проверьте подключение к интернету.</p>
+    {% endif %}
+</body>
+</html>

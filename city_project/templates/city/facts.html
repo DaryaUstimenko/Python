@@ -1,0 +1,25 @@
+<!-- templates/city/facts.html -->
+{% extends 'city/base.html' %}
+
+{% block content %}
+<h1 class="page-title">📊 Интересные факты о городе</h1>
+
+<div style="margin-bottom: 20px; color: #666;">
+    Мы собрали для вас {{ total_facts }} удивительных фактов
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+    {% for fact in facts_list %}
+    <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px; border-radius: 15px; transition: transform 0.3s;">
+        <div style="font-size: 3em; margin-bottom: 10px;">{{ fact.icon }}</div>
+        <h3 style="color: #667eea; margin-bottom: 10px;">{{ fact.fact }}</h3>
+        <p style="color: #555; line-height: 1.5;">{{ fact.description }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 10px; text-align: center;">
+    <h3>💡 Знаете ли вы?</h3>
+    <p style="margin-top: 10px;">Наш город входит в топ-10 самых красивых городов мира!</p>
+</div>
+{% endblock %}

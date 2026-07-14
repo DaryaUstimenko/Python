@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Информация о регионе</title>
+</head>
+<body>
+    <h1>Регион: {{ region_name }}</h1>
+    <h2>Страны в этом регионе:</h2>
+    <ul>
+        {% for country in countries %}
+            <li>{{ country.name.common }} ({{ country.capital.0 }})</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'region_list' %}">Вернуться к списку регионов</a>
+</body>
+</html>

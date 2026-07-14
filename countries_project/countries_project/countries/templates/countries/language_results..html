@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Страны, говорящие на {{ language }}</title>
+</head>
+<body>
+    <h1>Страны, говорящие на {{ language }}</h1>
+    <ul>
+        {% for country in countries %}
+            <li>{{ country.name.common }} ({{ country.capital.0 }})</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'language_search' %}">Вернуться к поиску по языку</a>
+</body>
+</html>

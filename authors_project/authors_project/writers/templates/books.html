@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Топ лучших книг</h1>
+<div class="books-list">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #2c3e50; color: white;">
+                <th style="padding: 10px; text-align: left;">№</th>
+                <th style="padding: 10px; text-align: left;">Название</th>
+                <th style="padding: 10px; text-align: left;">Автор</th>
+                <th style="padding: 10px; text-align: left;">Рейтинг</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">{{ forloop.counter }}</td>
+                <td style="padding: 10px;">{{ book.title }}</td>
+                <td style="padding: 10px;">{{ book.author }}</td>
+                <td style="padding: 10px;">{{ book.rating }} / 10</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center;">Список книг пуст.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

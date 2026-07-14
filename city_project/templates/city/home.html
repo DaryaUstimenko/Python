@@ -1,0 +1,45 @@
+<!-- templates/city/home.html -->
+{% extends 'city/base.html' %}
+
+{% block content %}
+<h1 class="page-title">Город {{ city_name }}!</h1>
+
+<div style="text-align: center; margin-bottom: 30px;">
+    <p style="font-size: 1.2em; color: #666; line-height: 1.8;">
+        {{ description }}
+    </p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 40px;">
+    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <div style="font-size: 3em;">🏛️</div>
+        <h3>Богатая история</h3>
+        <p>Город с многовековой историей и культурным наследием</p>
+    </div>
+    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <div style="font-size: 3em;">🚀</div>
+        <h3>Современный мегаполис</h3>
+        <p>Развитая инфраструктура и высокие технологии</p>
+    </div>
+    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <div style="font-size: 3em;">🎭</div>
+        <h3>Культурная столица</h3>
+        <p>Театры, музеи, выставки и фестивали</p>
+    </div>
+    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <div style="font-size: 3em;">🌳</div>
+        <h3>Зеленый город</h3>
+        <p>Множество парков и зон отдыха</p>
+    </div>
+</div>
+
+<div style="margin-top: 40px; padding: 20px; background: #e8f4f8; border-radius: 10px;">
+    <h3>📌 Быстрые ссылки</h3>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+        <a href="{% url 'news' %}" style="color: #667eea;">📰 Последние новости</a>
+        <a href="{% url 'history_main' %}" style="color: #667eea;">📰 Последние новости</a>
+        <a href="{% url 'government' %}" style="color: #667eea;">👥 Руководство города</a>
+        <a href="{% url 'contacts' %}" style="color: #667eea;">📞 Экстренные телефоны</a>
+    </div>
+</div>
+{% endblock %}
